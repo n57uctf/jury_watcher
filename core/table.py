@@ -1,65 +1,40 @@
+import time
+from typing import List, Dict
+
 import lxml.html
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import time
 
-chrome_options = Options()
 status_list = ["down", "shit", "corrupt", "mumble", "up"]
-chrome_options.add_argument('--headless')
-
-
-class Service:
-    def __init__(self, status="up", fdef=0, fatt=0):
-        self.status = status
-        self.fdef = fdef
-        self.fatt = fatt
-
-    def parse(self, el):
-        status_el = None
-        for status in status_list:
-            status_el = el.xpath(f"./div[@class='service-status {status}']")
-            if len(status_el) != 0:
-                self.status = status
-                break
-        flags = status_el[0].xpath("./div[@class='service-att-def']")[0].text.split('/')
-        self.fdef = int(flags[0])
-        self.fatt = int(flags[1])
-
-
-class Team:
-    def __init__(self, name="", services=None):
-        if services is None:
-            services = []
-        self.name = name
-        self.services = services
-
-    def parse(self, el):
-        n = el.xpath("./div[@class='team']/div[@class='team-name']")
-        self.name = n[0].text
-        if self.name is None:
-            self.name = ""
-        services = el.xpath("./div[@class='service']")
-        for service in services:
-            s = Service()
-            s.parse(service)
-            self.services.append(s)
 
 
 class Table:
     def __init__(self, url):
-        self.service_names = []
-        self.teams = []
-        self.url = url
+        self.service_names: List[str] = []
+        self.team_names: List[str] = []
+        self.teams: Dict = {}
+        self.url: str = url
+        if url is not None:
+            self.update()
 
-    def parse(self):
-        with webdriver.Chrome(options=chrome_options) as driver:
-            driver.get(self.url)
-            time.sleep(3)  # Javascript so fast you can see
-            doc = lxml.html.document_fromstring(driver.page_source)
-            self.get_services(doc)
-            self.get_teams(doc)
+    def update(self):
+        data: str = ""
+        if "file://" in self.url:
+            with open(self.url[7:], "r") as f:
+                data = f.read()
+        else:
+            chrome_options = Options()
+            chrome_options.add_argument('--headless')
+            with webdriver.Chrome(options=chrome_options) as driver:
+                driver.get(self.url)
+                time.sleep(3)  # Javascript so fast you can see
+                data = driver.page_source
+        doc = lxml.html.document_fromstring(data)
+        self.get_service_names(doc)
+        self.get_team_names(doc)
+        self.get_teams(doc)
 
-    def get_services(self, doc):
+    def get_service_names(self, doc):
         headers = doc.xpath("//div[@class='hdrs']/div[@class='service']")
         for header in headers:
             self.service_names.append(header.text)
@@ -67,17 +42,32 @@ class Table:
     def get_teams(self, doc):
         teams = doc.xpath("//div[@class='tm']")
         for team in teams:
-            t = Team()
-            t.parse(team)
-            self.teams.append(t)
+            name = team.xpath("./div[@class='team']/div[@class='team-name']")[0].text
+            self.teams[name] = {}
+            # Services
+            services = team.xpath("./div[@class='service']")
+            if not self.service_names:
+                self.get_service_names(doc)
+            if not self.team_names:
+                self.get_team_names(doc)
+            for i, service in enumerate(services):
+                self.teams[name][self.service_names[i]] = self.parse_service(service)
 
-    def __getitem__(self, team_name):
-        """
+    def get_team_names(self, doc):
+        teams = doc.xpath("//div[@class='tm']/div[@class='team']/div[@class='team-name']")
+        for team in teams:
+            self.team_names.append(team.text)
 
-        :type team_name: string
-        :rtype: Team, None
-        """
-        for team in self.teams:
-            if team.name == team_name:
-                return team
-        return None
+    @staticmethod
+    def parse_service(service_el):
+        service_template = {"status": None, "fatt": 0, "fdef": 0}
+        status_el = None
+        for status in status_list:
+            status_el = service_el.xpath(f"./div[@class='service-status {status}']")
+            if len(status_el) != 0:
+                service_template['status'] = status
+                break
+        flags = status_el[0].xpath("./div[@class='service-att-def']")[0].text.split('/')
+        service_template['fdef'] = int(flags[0])
+        service_template['fatt'] = int(flags[1])
+        return service_template

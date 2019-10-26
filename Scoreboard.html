@@ -1,0 +1,52 @@
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <title>Scoreboard</title>
+    <link href="css/scoreboard.css" rel="stylesheet">
+    <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+    <link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+</head>
+<body>
+<center>
+    <div class="game-name">SibirCTF`18</div>
+    <div class="game-time-range">2019-10-25 13:00:00 (UTC) - 2019-10-25 20:00:00 (UTC)</div>
+    <div class="game-description">Scoreboard</div>
+    <div id="scoreboard_content" style="display: block;">
+        <div class="scoreboard" id="table_scoreboard">
+            <div class="hdrs">
+                <div class="place">#</div>
+                <div class="team-logo"></div>
+                <div class="team">Team</div>
+                <div class="score">Score</div>
+                <div class="service">LNKS<br><small>(service)</small></div>
+            </div>
+            <div class="tm" id="team1" style="top: 70px;">
+                <div class="place" id="team1_place">1</div>
+                <div class="team-logo" id="team1_logo"><img class="team-logo" src="images/teams/unknown.png"></div>
+                <div class="team" id="team1_name">
+                    <div class="team-name">Tanuki</div>
+                    <div class="team-ip"> id: 1, ip: 192.168.1.100</div>
+                </div>
+                <div class="score" id="team1_score">554.04</div>
+                <div class="service">
+                    <div class="service-status down" id="team1_service1">
+                        <div class="service-att-def" id="team1_service1_ad">972 / 0</div>
+                        <div class="service-sla" id="team1_service1_sla">SLA: 57%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="loader_content" style="display: none;">
+        <div class="lds-facebook">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+</center>
+<script defer="defer" src="js/scoreboard.js"></script>
+
+
+</body>
+</html>
