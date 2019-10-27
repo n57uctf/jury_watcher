@@ -13,13 +13,16 @@ class TableTest(unittest.TestCase):
         self.t = Table(f"file://{getcwd()}/Scoreboard.html")
 
     def test_services(self):
-        self.assertEqual(['LNKS'], self.t.service_names)
+        self.assertEqual(['LNKS'],
+                         self.t.service_names)
 
     def test_teams(self):
-        self.assertEqual(['Tanuki'], self.t.team_names)
+        self.assertEqual(['Tanuki'],
+                         self.t.team_names)
 
     def test_dict(self):
-        self.assertEqual({'Tanuki': {'LNKS': {'status': 'down', 'fatt': 0, 'fdef': 972}}}, self.t.teams)
+        self.assertEqual({'Tanuki': {'LNKS': {'status': 'down', 'fatt': 0, 'fdef': 972}}},
+                         self.t.teams)
 
 
 class CheckTest(unittest.TestCase):
