@@ -1,5 +1,5 @@
 class Config(object):
-    ROUND_TIME = 60
+    ROUND_TIME = 5
     TEAM = "Tanuki"
     TABLE = "SibirCTF"
 
@@ -7,3 +7,5 @@ class Config(object):
 class TgConfig(object):
     TOKEN = ""
     SENDTO = ""
+    # Just a example, keep it blank, if u r not russian hacker
+    PROXY = {}

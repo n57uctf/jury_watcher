@@ -12,13 +12,13 @@ def table_fb(old, cur):
     for service in old.service_names:
         zero_attacks = True
         for team in old.team_names:
-            if old.teams[team][service]['fatt'] != 0:
+            if old.cells[team][service]['fatt'] != 0:
                 zero_attacks = False
                 break
         if not zero_attacks:
             continue
         for team in cur.team_names:
-            if cur.teams[team][service]['fatt'] != 0:
+            if cur.cells[team][service]['fatt'] != 0:
                 result.append((service, team))
     return result
 
@@ -33,7 +33,7 @@ def team_bloud(old, cur, team):
     """
     result: List[str] = []
     for service in old.service_names:
-        if cur.teams[team][service]['fatt'] - old.teams[team][service]['fatt'] > 0:
+        if cur.cells[team][service]['fatt'] - old.cells[team][service]['fatt'] > 0:
             result.append(service)
     return result
 
@@ -48,7 +48,7 @@ def team_owned(old, cur, team):
     """
     result: List[str] = []
     for service in old.service_names:
-        if cur.teams[team][service]['fdef'] - old.teams[team][service]['fdef'] < 0:
+        if cur.cells[team][service]['fdef'] - old.cells[team][service]['fdef'] < 0:
             result.append(service)
     return result
 
@@ -63,8 +63,7 @@ def team_change_status(old, cur, team):
     """
     result: List[Tuple] = []
     for service in cur.service_names:
-        old_status = old.teams[team][service]['status']
-        cur_status = cur.teams[team][service]['status']
-        if old_status != cur_status:
+        cur_status = cur.cells[team][service]['status']
+        if cur_status != "up":
             result.append((service, cur_status))
     return result
